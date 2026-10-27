@@ -1,4 +1,7 @@
-.venv/
+# Het model wordt gebouwd, niet gecommit. `python -m src.train` maakt het opnieuw.
+models/
+data/telko_klanten.csv
+data/nieuwe_maand.csv
 __pycache__/
-*.pyc
-.env
+.pytest_cache/
+.venv/
