@@ -35,8 +35,6 @@ python -m src.train
 # 7. Voorspellen op data (berekent storingskansen met lage drempelwaarde 0.15)
 python -m src.predict data/ai4i2020.csv
 
-# 8. Het 2-pagina's PDF-rapport en de figuren opnieuw genereren
-python -m src.generate_report
 ```
 
 Draai alle commando's **vanuit de projectmap**, niet vanuit `src/`.
@@ -100,8 +98,3 @@ Hoewel de baseline op papier fractioneel hoger scoort op ruwe recall (95.6% vs 9
    We passen een gestratificeerde split toe (`train_test_split(..., stratify=y, test_size=0.2, random_state=42)`), zodat beide subsets exact 3.39% storingen bevatten. Bovendien zitten alle voorbewerkingen (`StandardScaler` en `OneHotEncoder`) hermetisch opgesloten in een Scikit-learn `Pipeline`. De transformers worden uitsluitend gefit op trainingsdata en transformeren testdata blind, waardoor er geen gemiddelden of varianties lekken.
 
 ---
-
-## Indienen
-
-- **Repository:** https://github.com/JoussefB/cloud-for-ai
-- **PDF-bestand:** [`Cloud_for_AI_Deel_2_Rapport.pdf`](./Cloud_for_AI_Deel_2_Rapport.pdf) (exact 2 pagina's)
