@@ -18,10 +18,10 @@ def df(cfg):
 
 
 @pytest.fixture(scope="session")
-def model_en_auc(df, cfg):
-    return train(df, cfg)
+def model_en_recall(df, cfg):
+    return train(df, cfg, model_type="random_forest")
 
 
 @pytest.fixture(scope="session")
-def model(model_en_auc):
-    return model_en_auc[0]
+def model(model_en_recall):
+    return model_en_recall[0]

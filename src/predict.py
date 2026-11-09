@@ -1,7 +1,7 @@
-"""Een opgeslagen model laden en voorspellen voor nieuwe klanten.
+"""Een opgeslagen model laden en voorspellen voor nieuwe machines.
 
-python -m src.predict data/nieuwe_maand.csv
-python -m src.predict data/nieuwe_maand.csv --zonder-schema
+python -m src.predict data/nieuwe_data.csv
+python -m src.predict data/nieuwe_data.csv --zonder-schema
 """
 
 import sys
@@ -22,7 +22,7 @@ def laad_model(pad: str | Path) -> Pipeline:
 
 
 def voorspel(model: Pipeline, df: pd.DataFrame, cfg: dict) -> np.ndarray:
-    """De kans op opzeggen, één getal per klant."""
+    """De kans op machinefalen, één getal per machine."""
     return model.predict_proba(df[alle_features(cfg)])[:, 1]
 
 
@@ -34,8 +34,13 @@ def main(argv: list[str]) -> None:
     df = laad_data(pad, valideer_met=valideer)
     kansen = voorspel(laad_model(cfg["model"]["pad"]), df, cfg)
 
-    print(f"{len(kansen)} klanten. Gemiddelde kans op opzeggen: {kansen.mean():.1%}")
-    print(f"Klanten boven 50%: {(kansen > 0.5).sum()}")
+    threshold = cfg.get("threshold", 0.5)
+    alarmen = (kansen >= threshold).sum()
+
+    print(f"{len(kansen)} machines geëvalueerd.")
+    print(f"Gemiddelde faalkans: {kansen.mean():.1%}")
+    print(f"Alarmen (threshold={threshold}): {alarmen}")
+    print(f"Machines boven threshold: {alarmen}/{len(kansen)}")
 
 
 if __name__ == "__main__":

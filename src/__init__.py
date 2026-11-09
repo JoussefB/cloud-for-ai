@@ -1,1 +1,1 @@
-"""Het Telko-opzegmodel, als pakket in plaats van als notebook."""
+"""Predictive Maintenance — machinefalen voorspellen op basis van sensordata."""

@@ -1,7 +1,7 @@
 """Test de data, niet alleen de code. Garbage in, garbage out.
 
 Elke test hieronder neemt de echte data, maakt er bewust iets aan stuk, en controleert dat
-het schema het tegenhoudt. Een schema dat alles doorlaat, is geen schema.
+het schema het tegenhoudt.
 """
 
 import pandera.errors
@@ -11,35 +11,41 @@ from src import schema
 
 
 def test_echte_data_is_geldig(df):
+    """De echte dataset moet door het schema komen."""
     schema.TRAINING.validate(df)
 
 
 def test_hernoemde_kolom_wordt_geweigerd(df):
-    kapot = df.rename(columns={"maandbedrag": "maandbedrag_eur"})
+    """Een hernoemde kolom moet een fout geven."""
+    kapot = df.rename(columns={"Torque [Nm]": "Torque_Nm"})
     with pytest.raises(pandera.errors.SchemaError):
         schema.TRAINING.validate(kapot)
 
 
-def test_bedrag_in_cent_wordt_geweigerd(df):
-    # Het stilste soort fout: de kolom bestaat nog, het type klopt nog, de eenheid niet.
-    kapot = df.assign(maandbedrag=df["maandbedrag"] * 100)
-    with pytest.raises(pandera.errors.SchemaError):
-        schema.TRAINING.validate(kapot)
-
-
-def test_onbekend_contract_wordt_geweigerd(df):
+def test_temperatuur_buiten_bereik_wordt_geweigerd(df):
+    """Temperatuur ver boven het bereik (bv. Fahrenheit i.p.v. Kelvin) moet falen."""
     kapot = df.copy()
-    kapot.loc[0, "contract"] = "ongeldig"
+    kapot["Air temperature [K]"] = kapot["Air temperature [K]"] + 200
     with pytest.raises(pandera.errors.SchemaError):
         schema.TRAINING.validate(kapot)
 
 
-def test_prepaid_contract_wordt_toegelaten(df):
-    prepaid = df.copy()
-    prepaid.loc[0, "contract"] = "prepaid"
-    schema.TRAINING.validate(prepaid)
+def test_onbekend_type_wordt_geweigerd(df):
+    """Een producttype dat niet L/M/H is, moet falen."""
+    kapot = df.copy()
+    kapot.loc[0, "Type"] = "X"
+    with pytest.raises(pandera.errors.SchemaError):
+        schema.TRAINING.validate(kapot)
+
+
+def test_negatieve_slijtage_wordt_geweigerd(df):
+    """Negatieve tool wear is fysiek onmogelijk."""
+    kapot = df.copy()
+    kapot.loc[0, "Tool wear [min]"] = -5
+    with pytest.raises(pandera.errors.SchemaError):
+        schema.TRAINING.validate(kapot)
 
 
 def test_voorspellen_vraagt_geen_doelkolom(df, cfg):
-    # Bij het voorspellen ken je het antwoord nog niet. Het invoerschema mag het niet eisen.
+    """Bij het voorspellen ken je het antwoord nog niet. Het invoerschema mag het niet eisen."""
     schema.INVOER.validate(df.drop(columns=[cfg["doel"]]))

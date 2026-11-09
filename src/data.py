@@ -14,8 +14,7 @@ def laad_data(
     """Lees een csv in en valideer hem tegen een schema.
 
     `lazy=True` verzamelt alle fouten in één keer, in plaats van te stoppen bij de eerste.
-    Geef `valideer_met=None` om zonder validatie in te lezen. Dat doe je alleen om te zien
-    wat er misloopt zonder.
+    Geef `valideer_met=None` om zonder validatie in te lezen.
     """
     df = pd.read_csv(pad)
     if valideer_met is None:
@@ -27,7 +26,7 @@ def laad_data(
 
 
 def samenvatting(fouten: pa.errors.SchemaErrors, pad) -> str:
-    """Eén regel per kapotte controle, met drie voorbeelden, in plaats van een muur tekst."""
+    """Eén regel per kapotte controle, met drie voorbeelden."""
     regels = [f"{pad} voldoet niet aan het schema:"]
     for (kolom, controle), groep in fouten.failure_cases.groupby(["column", "check"], dropna=False):
         voorbeelden = ", ".join(str(v) for v in groep["failure_case"].unique()[:3])
